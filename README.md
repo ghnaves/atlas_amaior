@@ -10,7 +10,7 @@ WONG, L. L. R.; GIVISIEZ, G. H. N.; OLIVEIRA, E. L. de. A maior mudança demogr�
 
 A proposta é **promover transparência metodológica** e permitir a **reprodutibilidade dos resultados apresentados**, bem como facilitar o uso e a adaptação dos procedimentos por outros pesquisadores interessados nos temas abordados.
 
-> **Aviso**: Este repositório utiliza dados públicos da Organização das Nações Unidas (ONU) e do Instituto Brasileiro de Geografia e Estatística (IBGE) conforme permitido para uso não comercial. Os dados brutos não estão redistribuídos aqui. Para acesso oficial, consulte: <https://www.un.org>
+> **Aviso**: Este repositório utiliza dados públicos da Organização das Nações Unidas (ONU) e do Instituto Brasileiro de Geografia e Estatística (IBGE) conforme permitido para uso não comercial. Os dados brutos não estão redistribuídos aqui e o acesso é feito via API (Application Programming Interface ou Interface de Programação de Aplicações. Para acesso oficial visite <https://population.un.org/wpp/> e [https://sidra.ibge.gov.br](https://sidra.ibge.gov.br/pesquisa/censo-demografico){.uri}
 
 ## Licença
 
