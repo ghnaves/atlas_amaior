@@ -1,17 +1,40 @@
 # atlas_amaior
 
-<!-- badges: start -->
+O objetivo deste repositório é disponibilizar os códigos e scripts em R utilizados na elaboração do artigo:
 
-<!-- badges: end -->
+WONG, Laura Lídia Rodríguez; GIVISIEZ, Gustavo Henrique Naves; OLIVEIRA, Elzira Lucia de. A maior mudança demográfica na história moderna da humanidade: Brasil e o mundo. *In*: SANTOS, L. B.; OLIVEIRA, E. L. de; CINTRA, D. P. (org.). **O regional na interface da pesquisa e da extensão: Indicadores, métodos e ferramentas**. Jundiaí, SP: Paco Editorial, 2025. p. 11–46.
 
-O objetivo deste repositório é **disponibilizar os códigos e scripts utilizados na produção do artigo**:
+A iniciativa busca fortalecer a transparência metodológica e garantir a reprodutibilidade dos resultados apresentados, além de facilitar o uso, a adaptação e o aprimoramento dos procedimentos por outros pesquisadores interessados nas temáticas abordadas.
 
-WONG, L. L. R.; GIVISIEZ, G. H. N.; OLIVEIRA, E. L. de. A maior mudança demográfica na história moderna da humanidade: Brasil e o mundo. [*S. l.*: *s. n.*], 2025.
+**Aviso:** Este repositório utiliza dados públicos da Organização das Nações Unidas (ONU) e do Instituto Brasileiro de Geografia e Estatística (IBGE), conforme permitido para uso não comercial. Os dados brutos não são redistribuídos aqui; o acesso é realizado diretamente pelas APIs oficiais. Para consulta às fontes originais, visite:
 
-A proposta é **promover transparência metodológica** e permitir a **reprodutibilidade dos resultados apresentados**, bem como facilitar o uso e a adaptação dos procedimentos por outros pesquisadores interessados nos temas abordados.
+• <https://population.un.org/wpp/>
 
-> **Aviso**: Este repositório utiliza dados públicos da Organização das Nações Unidas (ONU) e do Instituto Brasileiro de Geografia e Estatística (IBGE) conforme permitido para uso não comercial. Os dados brutos não estão redistribuídos aqui e o acesso é feito via API (Application Programming Interface ou Interface de Programação de Aplicações. Para acesso oficial visite <https://population.un.org/wpp/> e [https://sidra.ibge.gov.br](https://sidra.ibge.gov.br/pesquisa/censo-demografico){.uri}
+• <https://sidra.ibge.gov.br>
 
-## Licença
+### Codificação
 
-Este repositório está licenciado sob a [Creative Commons BY-NC 4.0](%5Bhttps://creativecommons.org/licenses/by-nc/4.0/).](<https://creativecommons.org/licenses/by-nc/4.0/>).)
+O script principal é R/chapter_figures.R, responsável por executar todo o processamento das figuras apresentadas no artigo. Para sua utilização, é necessário configurar previamente no ambiente R o *token* de acesso à API do **UN Data Portal** ([https://population.un.org/dataportal/about/dataapi)](https://population.un.org/dataportal/about/dataapi). O scrip cria uma banco de dados SQLite e o popula com dados da projeção da ONU. Os dados do IBGE são baixados diretamente do API do SIDRA.
+
+#### Bibliotecas utlizadas
+
+```{r eval=FALSE}
+library(here)
+library(dplyr)
+library(ggplot2)
+library(tibble)
+library(ggsci)
+library(readr)
+library(stringr)
+library(tidyr)
+library(patchwork)
+library(jsonlite)
+library(httr)
+library(readxl)
+library(snakecase)
+library(CGPfunctions)
+library(ggrepel)
+library(DBI)
+library(RSQLite)
+library(stringi) #Opcional
+```

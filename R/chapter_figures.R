@@ -7,7 +7,6 @@ library('readr')
 library('stringr')
 library('tidyr')
 
-source('R/pop_pyr.R')
 source('R/prepare_data.R')
 #### Inicializações ----
 
@@ -43,6 +42,8 @@ variants_all <- sql_basic("SELECT * FROM variants")
 
 
 #### Figura 1 - Prehistoria ----
+
+### OBSERVAÇÃO: Esses dois gráficos foram ajustados manualmente no Microsoft Excel e no Adobe Illustrator.
 
 library('jsonlite')
 
@@ -420,7 +421,7 @@ query = "SELECT * FROM locations WHERE locationID = 76"
 locations <- sql_basic(query)
 query = "SELECT * FROM indicators WHERE indicatorId IN (49,46)"
 indicators <- sql_basic(query)
-years <- c(1950,2000,2025,2050)
+years <- c(1950, 2000, 2025, 2050, 2100)
 query = paste0("SELECT * FROM times WHERE timeLabel IN ('",
                paste(years, collapse = "', '"), "')")
 times <- sql_basic(query)
@@ -458,7 +459,7 @@ figura5_df = sql_basic(query) %>%
 gg = ggplot(figura5_df, 
             aes(x = age_f, y = sexage_population, 
                 group = sex, fill = sex)) +
-  facet_wrap(~year,scales = "fixed") +
+  facet_wrap(~year, scales = "fixed") +
   geom_bar(stat = 'identity') +
   coord_flip() +
   scale_y_continuous(
@@ -492,31 +493,31 @@ gg = ggplot(figura5_df,
 ggsave('figures/figura5.jpeg', device = 'jpeg', plot = gg, width = 24, height = 18, dpi = 300, units = 'cm')
 
 
-figura4_df %>%
+figura5_df %>%
   filter(year == 2000 & age_f >= '50-54')%>%
   mutate(sexage_population = abs(sexage_population))%>%
   summarise(mais50 = sum(sexage_population),
             total_population = first(total_population))
 
-figura4_df %>%
+figura5_df %>%
   filter(year == 2025 & age_f >= '75-79')%>%
   mutate(sexage_population = abs(sexage_population))%>%
   summarise(mais75 = sum(sexage_population),
             total_population = first(total_population))
 
-figura4_df %>%
+figura5_df %>%
   filter(year == 1950)%>%
   mutate(sexage_population = abs(sexage_population))%>%
   summarise(mais50 = sum(sexage_population),
             total_population = first(total_population))
 
-figura4_df %>%
+figura5_df %>%
   filter(year == 2025)%>%
   mutate(sexage_population = abs(sexage_population))%>%
   summarise(mais75 = sum(sexage_population),
             total_population = first(total_population))
 
-figura4_df %>%
+figura5_df %>%
   filter(year == 2050 & age_f >= '25-29')%>%
   mutate(sexage_population = abs(sexage_population))%>%
   summarise(mais75 = sum(sexage_population),
@@ -708,9 +709,9 @@ gg = ggplot(data = figura7_df) +
 
 ggsave('figures/figura7.jpeg', device = 'jpeg', plot = gg, width = 24, height = 24*0.5, dpi = 300, units = 'cm')
 
-#### Figura 8 Quadro criado no Excel (Tables.xlsx) ----
+####Quadro 1 criado no Excel ----
 
-#### Figura 9 Razào de Dependencias em ----
+#### Figura 8 Razào de Dependencias em ----
 # Regiões de menor desenvolvimento socioeconômico,
 # Regiões em desenvolvimento socioeconômico, e
 # Regiões de alto desenvolvimento socioeconômico
@@ -745,7 +746,7 @@ query = "SELECT
 
 #data = sql_basic("SELECT * from data WHERE ageId = 1015")
 
-figura9_df = sql_basic(query) %>%
+figura8_df = sql_basic(query) %>%
   mutate(location_f = factor(locationId,levels = c(941, 934, 901),
                              labels = c('Regiões menos desenvolvidas',
                                         'Regiões em desenvolvimento',
@@ -759,11 +760,11 @@ figura9_df = sql_basic(query) %>%
   arrange(desc(location_f))
 
 
-gg = ggplot(data = figura9_df) +
+gg = ggplot(data = figura8_df) +
   facet_wrap(~location_f, labeller = labeller(location_f = custom_labeller)) +
   geom_area(data = figura9_df%>%
               filter(ageId %in% c(1000,1005)), aes(x = year,y = value, fill = indicator_f)) +
-  geom_line(data = figura11_df%>%
+  geom_line(data = figura9_df%>%
               filter(ageId %in% c(1015)), aes(x = year,y = value), linewidth = 1)+
   scale_x_continuous(name = "Ano", breaks=seq(1950,2100,25))+
   scale_y_continuous(
@@ -776,12 +777,9 @@ gg = ggplot(data = figura9_df) +
         panel.grid.minor.x = element_blank(),
         legend.position = "bottom")
 
-ggsave('figures/figura9.jpeg', device = 'jpeg', plot = gg, width = 24, height = 24*0.5, dpi = 300, units = 'cm')
+ggsave('figures/figura8.jpeg', device = 'jpeg', plot = gg, width = 24, height = 24*0.5, dpi = 300, units = 'cm')
 
-#### Figura 10 Razào de Dependencias em ----
-# Regiões de menor desenvolvimento socioeconômico,
-# Regiões em desenvolvimento socioeconômico, e
-# Regiões de alto desenvolvimento socioeconômico
+#### Figura 8 Razào de Dependencias no Brasil 
 locations <- sql_basic("SELECT * FROM locations WHERE locationId IN (76)")
 indicators = sql_basic("SELECT * FROM indicators WHERE indicatorId IN (83, 84, 85, 86)")
 years <- seq(1950, 2100)
@@ -811,40 +809,37 @@ query = "SELECT
     AND d.variantId = 4
     AND d.ageId IN (1000,1005,1015)"
 
-#data = sql_basic("SELECT * from data WHERE ageId = 1015")
-
-figura10_df = sql_basic(query) %>%
+figura9_df = sql_basic(query) %>%
   mutate(indicator_f = factor(indicatorId, levels = c(86, 84, 83),
                               labels = c('Razão de Depedência Total',
                                          'Razão de Dependência de Idosos',
                                          'Razão de Dependência de Jovens')))
 
 
-gg = ggplot() +
-  geom_area(data = figura10_df%>%
+gg = ggplot(data = figura9_df) +
+  geom_area(data = figura9_df%>%
               filter(ageId %in% c(1000,1005)), aes(x = year,y = value, fill = indicator_f)) +
-  geom_line(data = figura10_df%>%
+  geom_line(data = figura9_df%>%
               filter(ageId %in% c(1015)), aes(x = year,y = value), linewidth = 1)+
-  scale_x_continuous(name = "Ano", breaks=seq(1950,2100,10))+
+  scale_x_continuous(name = "Ano", breaks=seq(1950,2100,25))+
   scale_y_continuous(
-    name = "Razão de Dependência",
-    breaks = seq(0,100,10),
+    name = "Razão de Depedência",
+    breaks = seq(0,100,25),
     labels = scales::label_number(scale = 1, accuracy = 0.1)) +
   scale_fill_startrek(name = NULL)+
   hrbrthemes::theme_ipsum() +
   theme(axis.text.x = element_text(angle = 90, vjust = .5),
         panel.grid.minor.x = element_blank(),
-        legend.position = 'bottom')
+        legend.position = "bottom")
 
-ggsave('figures/figura10.jpeg', device = 'jpeg', plot = gg, width = 24, height = 24*0.5, dpi = 300, units = 'cm')
+ggsave('figures/figura9.jpeg', device = 'jpeg', plot = gg, width = 24, height = 24*0.5, dpi = 300, units = 'cm')
 
-
-#### Figura 11 Grandes Grupos de Idade Censos Brasileiros ----
+#### Figura 10 Grandes Grupos de Idade Censos Brasileiros ----
 
 library('jsonlite')
 library('httr')
 
-browseURL("https://apisidra.ibge.gov.br/")
+#browseURL("https://apisidra.ibge.gov.br/")
 
 monta_url_sidra <- function(...) {
   args <- list(...)
@@ -907,11 +902,11 @@ sidra_path <- monta_url_sidra(
   c2 = 0,
   c286 = 0,
   c287 = c(6653,93095,93096,93097,93098,93099,93100))
-figura11_1552_raw = consulta_sidra(sidra_path)
-temp_1 = figura11_1552_raw[1,]%>%
+figura10_1552_raw = consulta_sidra(sidra_path)
+temp_1 = figura10_1552_raw[1,]%>%
   mutate(across(everything(), ~ snakecase::to_snake_case(.x)))
-names(figura11_1552_raw) = temp_1
-figura11_1152 = figura11_1552_raw[-1,c(4,8,12)]
+names(figura10_1552_raw) = temp_1
+figura10_1152 = figura10_1552_raw[-1,c(4,8,12)]
 
 #browseURL("http://api.sidra.ibge.gov.br/desctabapi.aspx?c=9514")
 sidra_path <- monta_url_sidra(
@@ -924,15 +919,15 @@ sidra_path <- monta_url_sidra(
   N1 = 1
 )
 
-figura11_9514_raw = consulta_sidra(sidra_path)
-temp_1 = figura11_9514_raw[1,]%>%
+figura10_9514_raw = consulta_sidra(sidra_path)
+temp_1 = figura10_9514_raw[1,]%>%
   mutate(across(everything(), ~ snakecase::to_snake_case(.x)))
-names(figura11_9514_raw) = temp_1
-figura11_9514 = figura11_9514_raw[-1,c(4,5,9)]
+names(figura10_9514_raw) = temp_1
+figura10_9514 = figura10_9514_raw[-1,c(4,5,9)]
 
 
-figura11_df = figura11_9514 %>%
-  bind_rows(figura11_1152)%>%
+figura10_df = figura10_9514 %>%
+  bind_rows(figura10_1152)%>%
   mutate(valor = as.numeric(valor),
          ano = factor(ano, levels = c('2010', '2022'), ordered = TRUE),
          idade = if_else(
@@ -940,17 +935,17 @@ figura11_df = figura11_9514 %>%
                         "80 a 89 anos","100 anos ou mais","90 a 99 anos"),
            "80 anos ou mais",idade))
 
-figura11_df$idade_f = factor(figura11_df$idade, levels = unique(figura11_df$idade), ordered = TRUE)
-figura11_df = figura11_df %>%
+figura10_df$idade_f = factor(figura10_df$idade, levels = unique(figura10_df$idade), ordered = TRUE)
+figura10_df = figura10_df %>%
   group_by(ano, idade, idade_f) %>%
   summarise(valor = sum(valor), .groups = 'drop')
 
-n_anos <- length(levels(figura13_df$ano))
-pos_ano <- match("2010", levels(figura13_df$ano))
+n_anos <- length(levels(figura10_df$ano))
+pos_ano <- match("2010", levels(figura10_df$ano))
 offset <- (pos_ano - 0.5) / n_anos - 0.5
 
  
-figura13_diff_df <- figura13_df %>%
+figura10_diff_df <- figura10_df %>%
   group_by(ano,idade,idade_f) %>%
   summarise(valor = sum(valor), .groups = 'drop')%>%
   arrange(idade_f,ano) %>%
@@ -964,11 +959,13 @@ figura13_diff_df <- figura13_df %>%
     x_adjusted = as.numeric(idade_f) + offset * 0.9
   )
 
-gg = ggplot(data=figura13_df) +
+dodge_width = 0.8
+
+gg = ggplot(data=figura10_df) +
   geom_bar(aes(fill = ano, y = valor, x = idade_f),stat = "identity", 
            position = position_dodge(width = dodge_width)) +
   geom_segment(
-    data = figura13_diff_df,
+    data = figura10_diff_df,
     aes(
       x = x_adjusted,
       xend = x_adjusted,
@@ -977,7 +974,7 @@ gg = ggplot(data=figura13_df) +
     color = "black",
     linewidth = 1,
     arrow = arrow(length = unit(0.1, "inches"), ends = "last", type = "closed")) +
-  geom_label(data = figura13_diff_df, 
+  geom_label(data = figura10_diff_df, 
              aes(x = x_adjusted, y = valor - diff/2, 
                  label = paste0("+", diff_relativa, "%"), group = ano), 
              color = "black", size = 4, hjust = 0.5) +
@@ -989,12 +986,12 @@ gg = ggplot(data=figura13_df) +
   hrbrthemes::theme_ipsum() +
   theme(axis.text.x = element_text(angle = 0, vjust = .5))
 
-ggsave('figures/figura11.jpeg', device = 'jpeg', plot = gg, width = 24, height = 24*0.5, dpi = 300, units = 'cm')
+ggsave('figures/figura10.jpeg', device = 'jpeg', plot = gg, width = 24, height = 24*0.5, dpi = 300, units = 'cm')
 
 
-#### Figura 12 Potencial de Suporte ----
-locations <- sql_basic("SELECT * FROM locations WHERE 
-      location IN ('France','Italy','Cuba','Developed regions','Brazil', 'Republic of Korea')")
+#### Figura 11 Potencial de Suporte ----
+locations <- sql_basic("SELECT * FROM locations WHERE
+      locationId IN (901, 941, 934, 410, 380, 250, 192, 76)")
 indicators = sql_basic("SELECT * FROM indicators WHERE indicatorId IN (85)")
 years <- seq(1950, 2100)
 query = paste0("SELECT * FROM times WHERE timeLabel IN ('",
@@ -1006,6 +1003,7 @@ query = "SELECT
     d.value,
     i.indicator AS indicator,
     l.location AS location,
+    l.locationId AS locationId,
     a.ageLabel AS age,
     a.ageStart AS ageStart,
     a.ageEnd AS ageEnd,
@@ -1015,23 +1013,27 @@ query = "SELECT
     JOIN locations l ON d.locationID = l.locationID
     JOIN times t ON d.timeId = t.timeId
     JOIN ages a ON d.ageId = a.ageId
-    WHERE l.location IN ('France','Italy','Cuba','Developed regions','Brazil', 'Republic of Korea')
+    WHERE l.locationId IN (901, 941, 934, 410, 380, 250, 192, 76)
     AND d.indicatorId IN (85) 
     AND a.ageLabel = '[20-69/70+]'
     AND d.sexId = 3 
     AND d.variantId = 4"
 
-figura12_df = sql_basic(query)%>%
-  mutate(location_f = factor(location,
-                             levels = c('Developed regions','France','Italy','Cuba','Brazil', 'Republic of Korea'),
-                             labels = c('Regiões Desenvolvidas','França','Itália','Cuba','Brasil', 'Corea do Sul'),
+figura11_df = sql_basic(query)%>%
+  mutate(location_f = factor(locationId,
+                             levels = c(901, 941, 934, 250, 380, 192, 76, 410),
+                             labels = c('Regiões mais desenvolvidas',
+                                        'Regiões menos desenvolvidas',
+                                        'Países menos desenvolvidos',
+                                        'França','Itália','Cuba','Brasil','Coréia do Sul'),
                              ordered = TRUE))%>%
   arrange(desc(location))%>%
   mutate(indicator = 'Razão de suporte potencial (20-69 anos/70 anos ou mais)')
 
-gg = ggplot(data = figura12_df) +
-  geom_line(aes(x = year,y = value, colour = location_f), linewidth = 1) +
-  geom_hline(yintercept = 5, color='grey50', linetype = 'dashed') + 
+gg = ggplot(data = figura11_df %>%
+              filter(!(locationId  %in% c(941,934)))) +
+  geom_line(aes(x = year,y = value, colour = location_f, linetype = location_f), linewidth = 1) +
+  geom_hline(yintercept = 5, color='grey50', alpha = .5, linewidth = 1) + 
   scale_x_continuous(name = "Year", breaks=seq(1950,2100,10))+
   scale_y_continuous(
     name = "Razão de suporte potencial (20-69/70+)", 
@@ -1039,14 +1041,16 @@ gg = ggplot(data = figura12_df) +
     breaks = seq(0,50,5)) +
   scale_colour_startrek(
     name = "Legenda") +
+  scale_linetype_discrete(
+    name = "Legenda") +
   hrbrthemes::theme_ipsum() +
   theme(axis.text.x = element_text(angle = 90, vjust = .5),
         panel.grid.minor.x = element_blank(),
         legend.position = "bottom")
 
-ggsave('figures/figura12.jpeg', device = 'jpeg', plot = gg, width = 24, height = 24*0.7, dpi = 300, units = 'cm')
+ggsave('figures/figura11.jpeg', device = 'jpeg', plot = gg, width = 24, height = 24*0.7, dpi = 300, units = 'cm')
 
-#### Figura 13 Pirâmides ----
+#### Figura 12 Pirâmides ----
 
 url <- "ftp://geoftp.ibge.gov.br/organizacao_do_territorio/estrutura_territorial/divisao_territorial/2024/DTB_2024.zip"
 destfile <- "data/DTB_2024.zip"
@@ -1061,7 +1065,7 @@ dtb_area_estudo = readxl::read_excel('data/dtb/RELATORIO_DTB_BRASIL_2024_MUNICIP
   mutate(across(c(uf_co,rgint_co,rgim_co,muni_co,muni_co7), as.numeric))%>%
   filter(rgint_co %in% 3304:3305)
 
-browseURL("http://api.sidra.ibge.gov.br/desctabapi.aspx?c=200")
+#browseURL("http://api.sidra.ibge.gov.br/desctabapi.aspx?c=200")
 sidra_path <- monta_url_sidra(
   t = 200, 
   v = 93,
@@ -1072,14 +1076,13 @@ sidra_path <- monta_url_sidra(
   p = c(1970,1980,1991,2000,2010)
 )
 
-rm(list = ls(pattern = "^figura13"))
 
-figura13_200_raw = consulta_sidra(sidra_path)
-temp_1 = figura13_200_raw[1,]%>%
+figura12_200_raw = consulta_sidra(sidra_path)
+temp_1 = figura12_200_raw[1,]%>%
   mutate(across(everything(), ~ snakecase::to_snake_case(.x)))
-names(figura13_200_raw) = temp_1
+names(figura12_200_raw) = temp_1
 
-figura13_200 = figura13_200_raw[-1,c(4,7:11)]%>%
+figura12_200 = figura12_200_raw[-1,c(4,7:11)]%>%
   rename(muni_co = município_código,
          muni_no = município,
          idade = grupo_de_idade)%>%
@@ -1092,7 +1095,7 @@ figura13_200 = figura13_200_raw[-1,c(4,7:11)]%>%
                           labels = c(as.character(seq(0,75,5)),'80+'),
                           ordered = TRUE))
 
-browseURL("http://api.sidra.ibge.gov.br/desctabapi.aspx?c=9514")
+#browseURL("http://api.sidra.ibge.gov.br/desctabapi.aspx?c=9514")
 sidra_path <- monta_url_sidra(
   t = 9514, 
   v = 93,
@@ -1103,12 +1106,12 @@ sidra_path <- monta_url_sidra(
   C286 = 113635
 )
 
-figura13_9514_raw = consulta_sidra(sidra_path)
-temp_1 = figura13_9514_raw[1,]%>%
+figura12_9514_raw = consulta_sidra(sidra_path)
+temp_1 = figura12_9514_raw[1,]%>%
   mutate(across(everything(), ~ snakecase::to_snake_case(.x)))
-names(figura13_9514_raw) = temp_1
+names(figura12_9514_raw) = temp_1
 
-figura13_9514 = figura13_9514_raw[-1,c(4,6:10)]%>%
+figura12_9514 = figura12_9514_raw[-1,c(4,6:10)]%>%
   rename(muni_co = município_código,
          muni_no = município)%>%
   mutate(across(c('valor','muni_co','ano'), ~ as.numeric(.x)))%>%
@@ -1120,14 +1123,14 @@ figura13_9514 = figura13_9514_raw[-1,c(4,6:10)]%>%
                           labels = c(as.character(seq(0,75,5)),'80+'),
                           ordered = TRUE))
 
-figura13_df = bind_rows(figura13_9514,figura13_200) %>%
+figura12_df = bind_rows(figura12_9514,figura12_200) %>%
   group_by(ano, idade, idade_f, sexo)%>%
   summarise(valor = sum(valor, na.rm = TRUE), .groups = "drop")%>%
   group_by(ano)%>%
   mutate(total = sum(valor, na.rm = TRUE),
          poprel = if_else(sexo == 'Mulheres', valor/total, -valor/total))
 
-gg = ggplot(data=figura13_df) +
+gg = ggplot(data=figura12_df) +
   geom_bar(aes(fill = sexo, y = poprel, x = idade_f),stat = "identity", 
            position = position_stack())+
   facet_wrap(~ano) +
@@ -1146,7 +1149,7 @@ gg = ggplot(data=figura13_df) +
     values = c('#5C88DAFF','#CC0C00FF')) +
   scale_x_discrete(name = 'Grupos de Idade') +
   ggplot2::theme_minimal()+
-  geom_label(data = figura13_df %>%
+  geom_label(data = figura12_df %>%
                distinct(ano, total),
              aes(x = Inf, y = Inf, 
                  label = paste0("População=", 
@@ -1155,11 +1158,11 @@ gg = ggplot(data=figura13_df) +
                                                      scale = 10^-3)(total), " k")),
              hjust = 1.0, vjust = 1.0, size = 3, color = "black", inherit.aes = FALSE)
   
-ggsave('figures/figura13.jpeg', device = 'jpeg', plot = gg, width = 24, height = 24*0.6, dpi = 300, units = 'cm')
+ggsave('figures/figura12.jpeg', device = 'jpeg', plot = gg, width = 24, height = 24*0.6, dpi = 300, units = 'cm')
 
-#### Figura 14 Pirâmides ----
+#### Figura 13 Pirâmides 2022 ----
 
-figura14_df = bind_rows(figura13_9514,figura13_200) %>%
+figura13_df = bind_rows(figura12_9514,figura12_200) %>%
   filter(ano == '2022')%>%
   inner_join(dtb_area_estudo %>%
                select(-muni_no), by = c("muni_co" = "muni_co7"))%>%
@@ -1170,7 +1173,7 @@ figura14_df = bind_rows(figura13_9514,figura13_200) %>%
          poprel = if_else(sexo == 'Mulheres', valor/total, -valor/total))
 
 
-gg = ggplot(data=figura14_df) +
+gg = ggplot(data=figura13_df) +
   geom_bar(aes(fill = sexo, y = poprel, x = idade_f),stat = "identity", 
            position = position_stack())+
   facet_wrap(~rgim_no) +
@@ -1189,7 +1192,7 @@ gg = ggplot(data=figura14_df) +
     values = c('#5C88DAFF','#CC0C00FF')) +
   scale_x_discrete(name = 'Grupo de Idade') +
   ggplot2::theme_minimal()+
-  geom_label(data = figura14_df %>%
+  geom_label(data = figura13_df %>%
                distinct(rgim_no, total),
              aes(x = Inf, y = Inf, 
                  label = paste0("População=", 
@@ -1198,7 +1201,7 @@ gg = ggplot(data=figura14_df) +
                                                      scale = 10^-3)(total), " k")),
              hjust = 1.0, vjust = 1.0, size = 3, color = "black", inherit.aes = FALSE)
 
-ggsave('figures/figura14.jpeg', device = 'jpeg', plot = gg, width = 24, height = 24*0.6, dpi = 300, units = 'cm')
+ggsave('figures/figura13.jpeg', device = 'jpeg', plot = gg, width = 24, height = 24*0.6, dpi = 300, units = 'cm')
 
 
 
@@ -1207,7 +1210,7 @@ library('readxl')
 library('snakecase')
 library('stringi')
 
-browseURL("http://api.sidra.ibge.gov.br/desctabapi.aspx?c=202")
+#browseURL("http://api.sidra.ibge.gov.br/desctabapi.aspx?c=202")
 sidra_path <- monta_url_sidra(
   t = 202, 
   v = 93,
@@ -1227,7 +1230,7 @@ figura15_202 = figura15_202_raw[-1,c(4,6,8:10)]%>%
          muni_no = município)%>%
   mutate(across(c('valor','muni_co','ano'), ~ as.numeric(.x)))
 
-browseURL("http://api.sidra.ibge.gov.br/desctabapi.aspx?c=9514")
+#browseURL("http://api.sidra.ibge.gov.br/desctabapi.aspx?c=9514")
 sidra_path <- monta_url_sidra(
   t = 9514, 
   v = 93,
@@ -1351,13 +1354,13 @@ newggslopegraph_custom <- function(dataframe, Times, Measurement, Grouping, Data
                      length(unique(dataframe[[NGrouping]])), " ", NGrouping, "s\n"))
       LineColor <- rep(LineColor, length.out = length(unique(dataframe[[NGrouping]])))
     }
-    LineGeom <- list(geom_line(aes_(color = Grouping), size = LineThickness),
+    LineGeom <- list(geom_line(aes_(color = Grouping), linewidth = LineThickness),
                      scale_color_manual(values = LineColor))
   } else {
     if (LineColor == "ByGroup") {
-      LineGeom <- list(geom_line(aes_(color = Grouping, alpha = 1), size = LineThickness))
+      LineGeom <- list(geom_line(aes_(color = Grouping, alpha = 1), linewidth = LineThickness))
     } else {
-      LineGeom <- list(geom_line(aes_(), size = LineThickness, color = LineColor))
+      LineGeom <- list(geom_line(aes_(), linewidth = LineThickness, color = LineColor))
     }
   }
   
@@ -1424,7 +1427,7 @@ ggsave('figures/figura15.jpeg', device = 'jpeg', plot = gg, width = 3600, height
 #### Figura 16 Crescimento ----
 
 
-browseURL("http://api.sidra.ibge.gov.br/desctabapi.aspx?c=202")
+#browseURL("http://api.sidra.ibge.gov.br/desctabapi.aspx?c=202")
 sidra_path <- monta_url_sidra(
   t = 202, 
   v = 93,
@@ -1444,7 +1447,7 @@ figura16_202 = figura16_202_raw[-1,c(4,8:10)]%>%
          muni_no = município)%>%
   mutate(across(c('valor','muni_co','ano'), ~ as.numeric(.x)))
 
-browseURL("http://api.sidra.ibge.gov.br/desctabapi.aspx?c=9514")
+#browseURL("http://api.sidra.ibge.gov.br/desctabapi.aspx?c=9514")
 sidra_path <- monta_url_sidra(
   t = 9514, 
   v = 93,
@@ -1463,6 +1466,7 @@ names(figura16_9514_raw) = temp_1
 figura16_9514 = figura16_9514_raw[-1,c(4,8:10)]%>%
   rename(muni_co = município_código,
          muni_no = município)%>%
+  mutate(ano = 2022)%>%
   mutate(across(c('valor','muni_co','ano'), ~ as.numeric(.x)))
 
 
@@ -1470,6 +1474,7 @@ figura16_df = bind_rows(figura16_9514, figura16_202) %>%
   inner_join(dtb_area_estudo_resumo %>%
               select(-muni_no),
             by = c("muni_co" = "muni_co7"))%>%
+  arrange(muni_no_resumo, ano)%>%
   group_by(muni_co)%>%
   mutate(crescimento = 1/(ano - lag(ano))*log(valor/lag(valor)))%>%
   mutate(periodo = factor(ano, levels = c('1970', '1980', '1991', '2000', '2010', '2022'), 

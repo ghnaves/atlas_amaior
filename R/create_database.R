@@ -183,6 +183,16 @@ dbExecute(db, sql)
 dbWriteTable(db, "times", times, append = TRUE)
 rm(times)
 
+# --- Dados Mundo ---
+
+locations <- sql_basic("SELECT * FROM locations WHERE locationId IN (900)")
+indicators = sql_basic("SELECT * FROM indicators WHERE indicatorId IN (46,49)")
+years <- c(1950, 2000, 2050, 2100)
+query = paste0("SELECT * FROM times WHERE timeLabel IN ('",
+               paste(years, collapse = "', '"), "')")
+times <- sql_basic(query)
+main_insert(locations, times, indicators)
+
 # Fechar conexão
 dbExecute(db, "PRAGMA foreign_keys = ON;")
 dbDisconnect(db)

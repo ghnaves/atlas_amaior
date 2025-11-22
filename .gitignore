@@ -2,7 +2,13 @@
 .Rhistory
 .RData
 .Ruserdata
-*.xlsx
-*.xls
+data/index.txt
+data/locations_para_traducao.xlsx
+data/indicators_all.csv
+data/paises_e_territorios_codigos_e_abreviacoes.xls
 *.sqlite
+data/WPP2024_F01_LOCATIONS.xlsx
 *.csv
+data/*.zip
+data/dtb/*
+data/~$*
