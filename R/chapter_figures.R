@@ -1205,7 +1205,7 @@ ggsave('figures/figura13.jpeg', device = 'jpeg', plot = gg, width = 24, height =
 
 
 
-#### Figura 15 Razão de Sexos ----
+#### Figura 14 Razão de Sexos ----
 library('readxl')
 library('snakecase')
 library('stringi')
@@ -1220,12 +1220,12 @@ sidra_path <- monta_url_sidra(
   p = c(1970, 1980, 1991, 2000, 2010)
 )
 
-figura15_202_raw = consulta_sidra(sidra_path)
-temp_1 = figura15_202_raw[1,]%>%
+figura14_202_raw = consulta_sidra(sidra_path)
+temp_1 = figura14_202_raw[1,]%>%
   mutate(across(everything(), ~ snakecase::to_snake_case(.x)))
-names(figura15_202_raw) = temp_1
+names(figura14_202_raw) = temp_1
 
-figura15_202 = figura15_202_raw[-1,c(4,6,8:10)]%>%
+figura14_202 = figura14_202_raw[-1,c(4,6,8:10)]%>%
   rename(muni_co = município_código,
          muni_no = município)%>%
   mutate(across(c('valor','muni_co','ano'), ~ as.numeric(.x)))
@@ -1241,12 +1241,12 @@ sidra_path <- monta_url_sidra(
   p = 2022
 )
 
-figura15_9514_raw = consulta_sidra(sidra_path)
-temp_1 = figura15_9514_raw[1,]%>%
+figura14_9514_raw = consulta_sidra(sidra_path)
+temp_1 = figura14_9514_raw[1,]%>%
   mutate(across(everything(), ~ snakecase::to_snake_case(.x)))
-names(figura15_9514_raw) = temp_1
+names(figura14_9514_raw) = temp_1
 
-figura15_9514 = figura15_9514_raw[-1,c(4,6,9:11)]%>%
+figura14_9514 = figura14_9514_raw[-1,c(4,6,9:11)]%>%
   rename(muni_co = município_código,
          muni_no = município)%>%
   mutate(across(c('valor','muni_co','ano'), ~ as.numeric(.x)))
@@ -1275,7 +1275,7 @@ dtb_area_estudo_resumo = dtb_area_estudo %>%
                                   width = 14, 
                                   side = "right", pad = " "))
 
-figura15_df = bind_rows(figura15_9514,figura15_202) %>%
+figura14_df = bind_rows(figura14_9514,figura14_202) %>%
   pivot_wider(names_from = sexo, values_from = valor) %>%
   mutate(rs = round(Homens / Mulheres, digits = 2))%>%
   select(-Homens,-Mulheres)%>%
@@ -1405,8 +1405,8 @@ newggslopegraph_custom <- function(dataframe, Times, Measurement, Grouping, Data
 
 
 gg = list()
-for(imediata in unique(figura15_df$rgim_no)){
-  gg[[imediata]] = newggslopegraph(dataframe = figura15_df %>%
+for(imediata in unique(figura14_df$rgim_no)){
+  gg[[imediata]] = newggslopegraph(dataframe = figura14_df %>%
                                      filter(rgim_no == imediata),
                                    LineColor =  pal_startrek("uniform")(7),
                                    Times = ano,
@@ -1422,9 +1422,9 @@ library('patchwork')
 
 gg = (gg[[1]]+gg[[2]]+gg[[3]])/(gg[[4]]+gg[[5]]+plot_spacer())
 
-ggsave('figures/figura15.jpeg', device = 'jpeg', plot = gg, width = 3600, height = 1800, dpi = 300, units = 'px')
+ggsave('figures/figura14.jpeg', device = 'jpeg', plot = gg, width = 3600, height = 1800, dpi = 300, units = 'px')
 
-#### Figura 16 Crescimento ----
+#### Figura 15 Crescimento ----
 
 
 #browseURL("http://api.sidra.ibge.gov.br/desctabapi.aspx?c=202")
@@ -1437,12 +1437,12 @@ sidra_path <- monta_url_sidra(
   p = c(1970, 1980, 1991, 2000, 2010)
 )
 
-figura16_202_raw = consulta_sidra(sidra_path)
-temp_1 = figura16_202_raw[1,]%>%
+figura15_202_raw = consulta_sidra(sidra_path)
+temp_1 = figura15_202_raw[1,]%>%
   mutate(across(everything(), ~ snakecase::to_snake_case(.x)))
-names(figura16_202_raw) = temp_1
+names(figura15_202_raw) = temp_1
 
-figura16_202 = figura16_202_raw[-1,c(4,8:10)]%>%
+figura15_202 = figura15_202_raw[-1,c(4,8:10)]%>%
   rename(muni_co = município_código,
          muni_no = município)%>%
   mutate(across(c('valor','muni_co','ano'), ~ as.numeric(.x)))
@@ -1458,19 +1458,19 @@ sidra_path <- monta_url_sidra(
   p = 2022
 )
 
-figura16_9514_raw = consulta_sidra(sidra_path)
-temp_1 = figura16_9514_raw[1,]%>%
+figura15_9514_raw = consulta_sidra(sidra_path)
+temp_1 = figura15_9514_raw[1,]%>%
   mutate(across(everything(), ~ snakecase::to_snake_case(.x)))
-names(figura16_9514_raw) = temp_1
+names(figura15_9514_raw) = temp_1
 
-figura16_9514 = figura16_9514_raw[-1,c(4,8:10)]%>%
+figura15_9514 = figura15_9514_raw[-1,c(4,8:10)]%>%
   rename(muni_co = município_código,
          muni_no = município)%>%
   mutate(ano = 2022)%>%
   mutate(across(c('valor','muni_co','ano'), ~ as.numeric(.x)))
 
 
-figura16_df = bind_rows(figura16_9514, figura16_202) %>%
+figura15_df = bind_rows(figura15_9514, figura15_202) %>%
   inner_join(dtb_area_estudo_resumo %>%
               select(-muni_no),
             by = c("muni_co" = "muni_co7"))%>%
@@ -1484,7 +1484,7 @@ figura16_df = bind_rows(figura16_9514, figura16_202) %>%
   filter(periodo != 'delete')
 
 gg_ls = list()
-for(imediata in unique(figura16_df$rgim_no)){
+for(imediata in unique(figura15_df$rgim_no)){
   gg_ls[[imediata]] = ggplot(figura16_df %>%
            filter(rgim_no == imediata), aes(x = muni_no_resumo, 
                         y = crescimento, fill = crescimento)) +
@@ -1507,5 +1507,5 @@ for(imediata in unique(figura16_df$rgim_no)){
 } 
 gg = gg_ls[[1]]/gg_ls[[2]]/gg_ls[[3]]/gg_ls[[4]]/gg_ls[[5]]
 
-ggsave('figures/figura16.jpeg', device = 'jpeg', plot = gg, width = 2400, height = 3600, dpi = 300, units = 'px')
+ggsave('figures/figura15.jpeg', device = 'jpeg', plot = gg, width = 2400, height = 3600, dpi = 300, units = 'px')
 
